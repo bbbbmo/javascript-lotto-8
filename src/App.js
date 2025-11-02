@@ -6,7 +6,7 @@ import {
   validatePositiveNumber,
   validateThousandUnit,
 } from "./validate.js";
-import { PRICE_UNIT } from "./const.js";
+import { PRICE_UNIT, winningPrices } from "./const.js";
 
 const inputPurchasePrice = async () => {
   const rawInput = await Console.readLineAsync("구입금액을 입력해 주세요.\n");
@@ -74,6 +74,48 @@ const inputBonusNumber = async (winningNumbers) => {
   return numberInput;
 };
 
+const getMatchText = (index) => {
+  if (index === 7) {
+    return "5개 일치, 보너스 볼 일치";
+  }
+  return `${index}개 일치`;
+};
+
+const calcWinningResult = (lottoNumbersArr, winningNumbers, bonusNumber) => {
+  const resultMap = new Map();
+
+  lottoNumbersArr.forEach((lottoNumbers) => {
+    const matchCount = lottoNumbers.filter((num) =>
+      winningNumbers.includes(num)
+    ).length;
+
+    if (matchCount < 3) {
+      return;
+    }
+
+    if (matchCount === 5) {
+      const hasBonus = lottoNumbers.includes(bonusNumber);
+      const prizeIndex = hasBonus ? 7 : 5;
+      const currentCount = resultMap.get(prizeIndex) || 0;
+      resultMap.set(prizeIndex, currentCount + 1);
+    } else {
+      const prizeIndex = matchCount;
+      const currentCount = resultMap.get(prizeIndex) || 0;
+      resultMap.set(prizeIndex, currentCount + 1);
+    }
+  });
+
+  const order = [3, 4, 5, 7, 6];
+
+  order.forEach((index) => {
+    const count = resultMap.get(index) || 0;
+    const price = winningPrices[index];
+    const formattedPrice = price.toLocaleString();
+    const matchText = getMatchText(index);
+    Console.print(`${matchText} (${formattedPrice}원) - ${count}개`);
+  });
+};
+
 class App {
   async run() {
     const purchasePrice = await inputPurchasePrice();
@@ -84,7 +126,8 @@ class App {
     const winningNumbers = await inputWinningNumbers();
 
     const bonusNumber = await inputBonusNumber(winningNumbers);
-    Console.print(bonusNumber);
+    Console.print("\n당첨 통계\n---");
+    calcWinningResult(lottoNumbersArr, winningNumbers, bonusNumber);
   }
 }
 
