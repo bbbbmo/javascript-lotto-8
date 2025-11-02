@@ -41,9 +41,9 @@ export const validateLottoNumberRange = (input) => {
   }
 };
 
-export const validateDuplicateNumbers = (numbers) => {
+export const validateDuplicateNumbers = (numbers, field) => {
   const uniqueNumbers = new Set(numbers);
   if (uniqueNumbers.size !== numbers.length) {
-    throw new Error("[ERROR] 당첨 번호에 중복된 숫자가 있습니다.");
+    throw new Error(`[ERROR] ${field}에 중복된 숫자가 있습니다.`);
   }
 };
