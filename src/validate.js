@@ -18,6 +18,7 @@ export const validatePositiveNumber = (input, field) => {
       `[ERROR] ${field}의 입력값은 1 이상의 정수로 입력해주세요.`
     );
   }
+  return numInput;
 };
 
 export const validateThousandUnit = (input) => {
