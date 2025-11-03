@@ -6,7 +6,7 @@ import {
   validatePositiveNumber,
   validateThousandUnit,
 } from "./validate.js";
-import { PRICE_UNIT, winningPrices } from "./const.js";
+import { BONUS_PRIZE_INDEX, PRICE_UNIT, winningInfo } from "./const.js";
 
 const inputPurchasePrice = async () => {
   const rawInput = await Console.readLineAsync("구입금액을 입력해 주세요.\n");
@@ -74,46 +74,51 @@ const inputBonusNumber = async (winningNumbers) => {
   return numberInput;
 };
 
-const getMatchText = (index) => {
-  if (index === 7) {
-    return "5개 일치, 보너스 볼 일치";
-  }
-  return `${index}개 일치`;
-};
-
 const calcWinningResult = (lottoNumbersArr, winningNumbers, bonusNumber) => {
-  const resultMap = new Map();
-
+  const result = [...winningInfo];
   lottoNumbersArr.forEach((lottoNumbers) => {
     const matchCount = lottoNumbers.filter((num) =>
       winningNumbers.includes(num)
     ).length;
+    const hasBonusNumber = lottoNumbers.includes(bonusNumber);
 
     if (matchCount < 3) {
       return;
     }
 
-    if (matchCount === 5) {
-      const hasBonus = lottoNumbers.includes(bonusNumber);
-      const prizeIndex = hasBonus ? 7 : 5;
-      const currentCount = resultMap.get(prizeIndex) || 0;
-      resultMap.set(prizeIndex, currentCount + 1);
+    if (hasBonusNumber && matchCount === 5) {
+      result[BONUS_PRIZE_INDEX].count += 1;
+      return;
+    }
+    const prizeInfo = result.find((item) => item.match === matchCount);
+    prizeInfo.count += 1;
+  });
+
+  return result;
+};
+
+const printWinningResult = (result) => {
+  result.forEach((item, index) => {
+    const formattedPrice = item.prizeMoney.toLocaleString();
+    if (index === BONUS_PRIZE_INDEX) {
+      Console.print(
+        `${item.match}개 일치, 보너스 볼 일치 (${formattedPrice}원) - ${item.count}개`
+      );
     } else {
-      const prizeIndex = matchCount;
-      const currentCount = resultMap.get(prizeIndex) || 0;
-      resultMap.set(prizeIndex, currentCount + 1);
+      Console.print(
+        `${item.match}개 일치 (${formattedPrice}원) - ${item.count}개`
+      );
     }
   });
+};
 
-  const order = [3, 4, 5, 7, 6];
-
-  order.forEach((index) => {
-    const count = resultMap.get(index) || 0;
-    const price = winningPrices[index];
-    const formattedPrice = price.toLocaleString();
-    const matchText = getMatchText(index);
-    Console.print(`${matchText} (${formattedPrice}원) - ${count}개`);
+const calcTotalYield = (result, purchasePrice) => {
+  let totalPrice = 0;
+  result.forEach((item) => {
+    totalPrice += item.count * item.prizeMoney;
   });
+  const totalYield = (totalPrice / purchasePrice) * 100;
+  return totalYield.toFixed(1);
 };
 
 class App {
@@ -127,7 +132,17 @@ class App {
 
     const bonusNumber = await inputBonusNumber(winningNumbers);
     Console.print("\n당첨 통계\n---");
-    calcWinningResult(lottoNumbersArr, winningNumbers, bonusNumber);
+
+    const result = calcWinningResult(
+      lottoNumbersArr,
+      winningNumbers,
+      bonusNumber
+    );
+
+    printWinningResult(result);
+    const totalYield = calcTotalYield(result, purchasePrice);
+
+    Console.print(`총 수익률은 ${totalYield}%입니다.`);
   }
 }
 
