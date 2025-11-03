@@ -4,6 +4,7 @@ import {
   validateDuplicateNumbers,
   validateEmptyInput,
   validateLottoNumberRange,
+  validateNumbersLength,
   validatePositiveNumber,
   validateThousandUnit,
 } from "./validate.js";
@@ -14,7 +15,7 @@ import {
   winningInfo,
 } from "./const.js";
 
-const validatePurchasePrice = (rawInput) => {
+export const validatePurchasePrice = (rawInput) => {
   const input = rawInput.trim();
   validateEmptyInput(input, FIELD_NAMES.PURCHASE_PRICE);
   const numberInput = validatePositiveNumber(input, FIELD_NAMES.PURCHASE_PRICE);
@@ -30,12 +31,12 @@ const inputPurchasePrice = async () => {
   return validatePurchasePrice(rawInput);
 };
 
-const calcPurchaseCount = (price) => {
+export const calcPurchaseCount = (price) => {
   const purchaseNum = Number(price) / PURCHASE_UNIT;
   return purchaseNum;
 };
 
-const createLottoNumbers = (purchaseNum) => {
+export const createLottoNumbers = (purchaseNum) => {
   const lottoArray = [];
 
   for (let i = 1; i <= purchaseNum; i++) {
@@ -55,18 +56,18 @@ const printLottoArray = (lottoArray) => {
   });
 };
 
-const validateWinningNumbers = (rawInput) => {
-  const input = rawInput.trim();
-  const splitArray = input.split(",");
+export const validateWinningNumbers = (rawInput) => {
+  const splitArray = rawInput.trim().split(",");
   const numberArray = splitArray.map((input) => {
     validateEmptyInput(input, FIELD_NAMES.WINNING_NUMBERS);
     const numberInput = validatePositiveNumber(
       input,
       FIELD_NAMES.WINNING_NUMBERS
     );
-    validateLottoNumberRange(numberInput);
+    validateLottoNumberRange(numberInput, FIELD_NAMES.WINNING_NUMBERS);
     return numberInput;
   });
+  validateNumbersLength(numberArray, FIELD_NAMES.WINNING_NUMBERS);
   validateDuplicateNumbers(numberArray, FIELD_NAMES.WINNING_NUMBERS);
   return numberArray;
 };
@@ -78,7 +79,7 @@ const inputWinningNumbers = async () => {
   return validateWinningNumbers(rawInput);
 };
 
-const validateBonusNumber = (rawInput, winningNumbers) => {
+export const validateBonusNumber = (rawInput, winningNumbers) => {
   const input = rawInput.trim();
   validateEmptyInput(input, FIELD_NAMES.BONUS_NUMBERS);
   const numberInput = validatePositiveNumber(input, FIELD_NAMES.BONUS_NUMBERS);
@@ -98,12 +99,13 @@ const inputBonusNumber = async (winningNumbers) => {
   return validateBonusNumber(rawInput, winningNumbers);
 };
 
-const incrementCount = (result, matchCount, hasBonus) => {
+export const incrementCount = (result, matchCount, hasBonus) => {
   if (matchCount < 3) {
     return;
   }
   if (matchCount === 5 && hasBonus) {
     result[BONUS_PRIZE_INDEX].count += 1;
+    return;
   }
 
   const target = result.find((item) => item.match === matchCount);
@@ -113,7 +115,7 @@ const incrementCount = (result, matchCount, hasBonus) => {
   target.count += 1;
 };
 
-const calcWinningResult = (lottoArray, winningNumbers, bonusNumber) => {
+export const calcWinningResult = (lottoArray, winningNumbers, bonusNumber) => {
   const result = structuredClone(winningInfo);
 
   lottoArray.forEach((lotto) => {
@@ -145,7 +147,7 @@ const printWinningResult = (result) => {
   });
 };
 
-const calcTotalYield = (result, purchasePrice) => {
+export const calcTotalYield = (result, purchasePrice) => {
   let totalPrice = 0;
   result.forEach((item) => {
     totalPrice += item.count * item.prizeMoney;
