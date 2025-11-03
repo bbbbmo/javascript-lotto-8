@@ -1,4 +1,4 @@
-import { PURCHASE_UNIT } from "../const.js";
+import { PURCHASE_UNIT } from "./const.js";
 
 export const validateEmptyInput = (input, field) => {
   if (!input || input === "") {
