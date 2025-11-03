@@ -4,7 +4,7 @@ import {
   validateLottoNumberRange,
   validateNumbersLength,
   validatePositiveNumber,
-} from "./utils/validate.js";
+} from "./validate.js";
 
 class Lotto {
   #numbers; // 로또 번호
@@ -25,12 +25,16 @@ class Lotto {
     });
   }
 
+  get numbers() {
+    return this.#numbers;
+  }
+
   getMatchCount(winningNumbers) {
-    return this.numbers.filter((num) => winningNumbers.includes(num)).length;
+    return this.#numbers.filter((num) => winningNumbers.includes(num)).length;
   }
 
   getHasBonus(bonusNumber) {
-    return this.numbers.includes(bonusNumber);
+    return this.#numbers.includes(bonusNumber);
   }
 }
 

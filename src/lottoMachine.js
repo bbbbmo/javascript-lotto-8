@@ -6,22 +6,28 @@ import {
   validateLottoNumberRange,
   validatePositiveNumber,
   validateThousandUnit,
-} from "./utils/validate.js";
+} from "./validate.js";
 import {
   BONUS_PRIZE_INDEX,
   FIELD_NAMES,
   PURCHASE_UNIT,
   winningInfo,
 } from "./const.js";
-import { parseInput } from "./utils/parse.js";
 
-const inputPurchasePrice = async () => {
-  const input = await parseInput(FIELD_NAMES.PURCHASE_PRICE);
+const validatePurchasePrice = (rawInput) => {
+  const input = rawInput.trim();
   validateEmptyInput(input, FIELD_NAMES.PURCHASE_PRICE);
   const numberInput = validatePositiveNumber(input, FIELD_NAMES.PURCHASE_PRICE);
   validateThousandUnit(numberInput);
 
   return numberInput;
+};
+
+const inputPurchasePrice = async () => {
+  const rawInput = await Console.readLineAsync(
+    `\n${FIELD_NAMES.PURCHASE_PRICE}을 입력해 주세요.\n`
+  );
+  return validatePurchasePrice(rawInput);
 };
 
 const calcPurchaseCount = (price) => {
@@ -44,15 +50,14 @@ const createLottoNumbers = (purchaseNum) => {
 };
 
 const printLottoArray = (lottoArray) => {
-  lottoArray.forEach((numbers) => {
-    Console.print(numbers);
+  lottoArray.forEach((lotto) => {
+    Console.print(`[${lotto.numbers.join(", ")}]`);
   });
 };
 
-const inputWinningNumbers = async () => {
-  const input = parseInput(FIELD_NAMES.WINNING_NUMBERS);
+const validateWinningNumbers = (rawInput) => {
+  const input = rawInput.trim();
   const splitArray = input.split(",");
-
   const numberArray = splitArray.map((input) => {
     validateEmptyInput(input, FIELD_NAMES.WINNING_NUMBERS);
     const numberInput = validatePositiveNumber(
@@ -60,20 +65,21 @@ const inputWinningNumbers = async () => {
       FIELD_NAMES.WINNING_NUMBERS
     );
     validateLottoNumberRange(numberInput);
-
     return numberInput;
   });
-
   validateDuplicateNumbers(numberArray, FIELD_NAMES.WINNING_NUMBERS);
-
   return numberArray;
 };
 
-/**
- * @description 보너스 번호 입력 기능
- */
-const inputBonusNumber = async (winningNumbers) => {
-  const input = parseInput(FIELD_NAMES.BONUS_NUMBERS);
+const inputWinningNumbers = async () => {
+  const rawInput = await Console.readLineAsync(
+    `\n${FIELD_NAMES.WINNING_NUMBERS}를 입력해 주세요.\n`
+  );
+  return validateWinningNumbers(rawInput);
+};
+
+const validateBonusNumber = (rawInput, winningNumbers) => {
+  const input = rawInput.trim();
   validateEmptyInput(input, FIELD_NAMES.BONUS_NUMBERS);
   const numberInput = validatePositiveNumber(input, FIELD_NAMES.BONUS_NUMBERS);
   validateLottoNumberRange(numberInput);
@@ -85,17 +91,26 @@ const inputBonusNumber = async (winningNumbers) => {
   return numberInput;
 };
 
+const inputBonusNumber = async (winningNumbers) => {
+  const rawInput = await Console.readLineAsync(
+    `\n${FIELD_NAMES.BONUS_NUMBERS}를 입력해 주세요.\n`
+  );
+  return validateBonusNumber(rawInput, winningNumbers);
+};
+
 const incrementCount = (result, matchCount, hasBonus) => {
   if (matchCount < 3) {
     return;
   }
-
   if (matchCount === 5 && hasBonus) {
-    result[PURCHASE_UNIT].count += 1;
+    result[BONUS_PRIZE_INDEX].count += 1;
   }
 
   const target = result.find((item) => item.match === matchCount);
-  if (!target) target.count += 1;
+  if (!target) {
+    return;
+  }
+  target.count += 1;
 };
 
 const calcWinningResult = (lottoArray, winningNumbers, bonusNumber) => {
