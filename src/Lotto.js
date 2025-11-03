@@ -1,3 +1,11 @@
+import {
+  validateDuplicateNumbers,
+  validateEmptyInput,
+  validateLottoNumberRange,
+  validateNumbersLength,
+  validatePositiveNumber,
+} from "./utils/validate.js";
+
 class Lotto {
   #numbers; // 로또 번호
 
@@ -7,12 +15,23 @@ class Lotto {
   }
 
   #validate(numbers) {
-    if (numbers.length !== 6) {
-      throw new Error("[ERROR] 로또 번호는 6개여야 합니다.");
-    }
+    const validateField = "로또 번호";
+    validateNumbersLength(numbers, validateField);
+    validateDuplicateNumbers(numbers, validateField);
+    numbers.forEach((num) => {
+      validateEmptyInput(num, validateField);
+      validatePositiveNumber(num, validateField);
+      validateLottoNumberRange(num, validateField);
+    });
   }
 
-  // TODO: 추가 기능 구현
+  getMatchCount(winningNumbers) {
+    return this.numbers.filter((num) => winningNumbers.includes(num)).length;
+  }
+
+  getHasBonus(bonusNumber) {
+    return this.numbers.includes(bonusNumber);
+  }
 }
 
 export default Lotto;

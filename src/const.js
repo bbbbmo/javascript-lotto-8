@@ -1,4 +1,13 @@
-export const PRICE_UNIT = 1000;
+export const ERROR_HEADER = "[ERROR]";
+
+export const PURCHASE_UNIT = 1000;
+
+export const FIELD_NAMES = {
+  PURCHASE_PRICE: "구입금액",
+  WINNING_NUMBERS: "당첨 번호",
+  BONUS_NUMBERS: "보너스 번호",
+  LOTTO_NUMBERS: "로또 번호",
+};
 
 export const winningInfo = [
   {
