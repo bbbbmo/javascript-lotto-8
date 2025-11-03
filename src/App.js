@@ -6,7 +6,7 @@ class App {
     try {
       await startLottoMachine();
     } catch (error) {
-      Console.print(`[ERROR] ${error.message}`);
+      Console.print(error.message);
     }
   }
 }
