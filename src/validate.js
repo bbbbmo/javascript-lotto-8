@@ -10,13 +10,15 @@ export const validatePositiveNumber = (input, field) => {
   const numInput = Number(input);
 
   if (Number.isNaN(numInput)) {
-    throw new Error(`${ERROR_HEADER} ${field}는 숫자여야 합니다.`);
+    throw new Error(`${ERROR_HEADER} ${field}의 값은 숫자여야 합니다.`);
   }
   if (!Number.isInteger(numInput)) {
-    throw new Error(`${ERROR_HEADER} ${field}는 정수여야 합니다.`);
+    throw new Error(`${ERROR_HEADER} ${field}의 값은  정수여야 합니다.`);
   }
   if (numInput <= 0) {
-    throw new Error(`${ERROR_HEADER} ${field}는 1이상의 양의 정수여야 합니다.`);
+    throw new Error(
+      `${ERROR_HEADER} ${field}의 값은  1이상의 양의 정수여야 합니다.`
+    );
   }
   return numInput;
 };
@@ -34,7 +36,7 @@ export const validateLottoNumberRange = (input, field) => {
   const isLottoNumberRange = numInput >= 1 && numInput <= 45;
   if (!isLottoNumberRange) {
     throw new Error(
-      `${ERROR_HEADER} ${field}는 1 ~ 45 이내의 숫자여야 합니다.`
+      `${ERROR_HEADER} ${field}의 값은  1 ~ 45 이내의 숫자여야 합니다.`
     );
   }
 };
